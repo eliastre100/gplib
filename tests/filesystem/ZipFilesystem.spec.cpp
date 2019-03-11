@@ -45,3 +45,19 @@ TEST(ZipFilesystem, isOpenClosedFile) {
     fs.close();
     ASSERT_FALSE(fs.isOpen());
 }
+
+TEST(ZipFilesystem, closeNotOpenedFile) {
+    gplib::filesystem::ZipFilesystem fs;
+
+    fs.close();
+    EXPECT_FALSE(fs.isOpen());
+}
+
+TEST(ZipFilesystem, closeOpenedFile) {
+    gplib::filesystem::ZipFilesystem fs;
+
+    fs.open("assets/testfile.zip");
+    EXPECT_TRUE(fs.isOpen());
+    fs.close();
+    EXPECT_FALSE(fs.isOpen());
+}
