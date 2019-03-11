@@ -1,5 +1,7 @@
 #include <iostream>
 #include <unordered_map>
+#include <filesystem/ZipFilesystem.hpp>
+
 #include "filesystem/ZipFilesystem.hpp"
 #include "exceptions/NoSuchFile.hpp"
 #include "exceptions/BadFileFormat.hpp"
@@ -40,7 +42,10 @@ std::vector<std::string> gplib::filesystem::ZipFilesystem::getFileNames() const 
     zip_int64_t num_entries = zip_get_num_entries(_zipfile, 0);
 
     for (zip_uint64_t i = 0; i < num_entries; ++i) {
-        files.emplace_back(zip_get_name(_zipfile, i, 0));
+        std::string filename(zip_get_name(_zipfile, i, 0));
+        if (filename.back() != '/') {
+            files.emplace_back(filename);
+        }
     }
     return files;
 }
@@ -68,3 +73,16 @@ void gplib::filesystem::ZipFilesystem::throwLibZipError(int status, const std::s
             throw std::runtime_error(libZipErrors.at(status));
     }
 }
+
+std::vector<std::string> gplib::filesystem::ZipFilesystem::getFolderNames() const {
+    std::vector<std::string> files;
+    zip_int64_t num_entries = zip_get_num_entries(_zipfile, 0);
+
+    for (zip_uint64_t i = 0; i < num_entries; ++i) {
+        std::string filename(zip_get_name(_zipfile, i, 0));
+        if (filename.back() == '/') {
+            filename.pop_back();
+            files.emplace_back(filename);
+        }
+    }
+    return files;}

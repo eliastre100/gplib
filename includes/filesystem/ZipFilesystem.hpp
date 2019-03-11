@@ -21,6 +21,7 @@ namespace gplib{
             void close();
 
             std::vector<std::string> getFileNames() const;
+            std::vector<std::string> getFolderNames() const;
 
         private:
             void throwLibZipError(int status, const std::string &file = "Unknown") const;

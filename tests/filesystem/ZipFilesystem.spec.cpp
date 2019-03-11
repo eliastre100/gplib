@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <algorithm>
 #include "exceptions/BadFileFormat.hpp"
 #include "filesystem/ZipFilesystem.hpp"
 #include "exceptions/NoSuchFile.hpp"
@@ -60,4 +61,40 @@ TEST(ZipFilesystem, closeOpenedFile) {
     EXPECT_TRUE(fs.isOpen());
     fs.close();
     EXPECT_FALSE(fs.isOpen());
+}
+
+TEST(ZipFilesystem, getFileNamesHaveFileNames) {
+    gplib::filesystem::ZipFilesystem fs;
+
+    fs.open("assets/testfile.zip");
+    auto fileNames = fs.getFileNames();
+    EXPECT_TRUE(std::find(fileNames.begin(), fileNames.end(), "file1") != fileNames.end());
+    EXPECT_TRUE(std::find(fileNames.begin(), fileNames.end(), "file2") != fileNames.end());
+    EXPECT_TRUE(std::find(fileNames.begin(), fileNames.end(), "file3") != fileNames.end());
+}
+
+TEST(ZipFilesystem, getFileNamesDoesntHaveFolderNames) {
+    gplib::filesystem::ZipFilesystem fs;
+
+    fs.open("assets/testfile.zip");
+    auto fileNames = fs.getFileNames();
+    EXPECT_FALSE(std::find(fileNames.begin(), fileNames.end(), "folder/") != fileNames.end());
+}
+
+TEST(ZipFilesystem, getDirectoryNamesHaveirectoryNames) {
+    gplib::filesystem::ZipFilesystem fs;
+
+    fs.open("assets/testfile.zip");
+    auto fileNames = fs.getFolderNames();
+    EXPECT_TRUE(std::find(fileNames.begin(), fileNames.end(), "folder") != fileNames.end());
+}
+
+TEST(ZipFilesystem, getDirectoryNamesDoesntHaveFileNames) {
+    gplib::filesystem::ZipFilesystem fs;
+
+    fs.open("assets/testfile.zip");
+    auto fileNames = fs.getFolderNames();
+    EXPECT_FALSE(std::find(fileNames.begin(), fileNames.end(), "file1") != fileNames.end());
+    EXPECT_FALSE(std::find(fileNames.begin(), fileNames.end(), "file2") != fileNames.end());
+    EXPECT_FALSE(std::find(fileNames.begin(), fileNames.end(), "file3") != fileNames.end());
 }
